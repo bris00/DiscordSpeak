@@ -90,7 +90,44 @@ class DiscordSpeak:
         self.current_window = None
         self.name = name
 
+    def process(self, modules, input):
+        message = Message(input)
+
+        for module in modules:
+            res = module.process_message(message)
+
+            if res is not None:
+                message.message = res
+
+        words = []
+        words.extend([Word(span, message, words, i) for i, span in enumerate(TreebankWordTokenizer().span_tokenize(message.message))])
+
+        for i, word in enumerate(words):
+            for module in modules:
+                new = module.process_word(word)
+
+                if new is not None:
+                    message.message = message.message[:word.span[0]] + new + message.message[word.span[1]:]
+                    
+                    extra_len = len(new) - (word.span[1] - word.span[0])
+                    word.span[1] += extra_len
+
+                    for w in words[i:]:
+                        w.span[0] += extra_len
+                        w.span[1] += extra_len
+
+        return message
+
+    def run_cli(self, modules, input):
+        message = self.process(modules, input)
+
+        print('\n-------------------------\n'.join((*message.additional_messages, message.message)))
+
     def run(self, modules):
+        if len(sys.argv) > 1:
+            self.run_cli(modules, ' '.join(sys.argv[1:]))
+            return
+
         name = self.name
         frame = None
 
@@ -135,34 +172,11 @@ class DiscordSpeak:
                 listen_to_process = p
 
         def handle_copied_message():
-            message = Message(pyperclip.paste())
-
-            for module in modules:
-                res = module.process_message(message)
-
-                if res is not None:
-                    message.message = res
+            message = self.process(pyperclip.paste())
 
             for m in message.additional_messages:
                 keyboard.write(m)
                 keyboard.press("enter")
-
-            words = []
-            words.extend([Word(span, message, words, i) for i, span in enumerate(TreebankWordTokenizer().span_tokenize(message.message))])
-
-            for i, word in enumerate(words):
-                for module in modules:
-                    new = module.process_word(word)
-
-                    if new is not None:
-                        message.message = message.message[:word.span[0]] + new + message.message[word.span[1]:]
-                        
-                        extra_len = len(new) - (word.span[1] - word.span[0])
-                        word.span[1] += extra_len
-
-                        for w in words[i:]:
-                            w.span[0] += extra_len
-                            w.span[1] += extra_len
 
             keyboard.write(message.message)
             keyboard.press("enter")

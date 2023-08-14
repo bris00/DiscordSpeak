@@ -9,6 +9,10 @@ class NoMistakes(Module):
         if key.name == "backspace":
             return False
 
+class Contractions(Module):
+    def process_message(self, message):
+        return message.message.replace("i had", "i'd")
+
 class Giggles(Module):
     GIGGLE_WORDS = [
         "hah",
@@ -35,6 +39,7 @@ def main():
         NoMistakes(),
         Outbursts(),
         Giggles(),
+        Contractions(),
     ])
 
 if __name__ == '__main__':
