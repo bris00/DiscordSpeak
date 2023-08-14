@@ -1,6 +1,3 @@
-## Requirements
-- Windows
-
 ## Setup environment
 - Download and install [Python](https://www.python.org/downloads/).
 - Run `python -m venv .venv`
