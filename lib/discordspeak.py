@@ -172,7 +172,7 @@ class DiscordSpeak:
                 listen_to_process = p
 
         def handle_copied_message():
-            message = self.process(pyperclip.paste())
+            message = self.process(modules, pyperclip.paste())
 
             for m in message.additional_messages:
                 keyboard.write(m)
