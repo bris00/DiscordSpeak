@@ -2,14 +2,11 @@ import wx.adv
 import wx
 import psutil
 import pyperclip
-import keyboard
 
 import sys
 import os
 
 from nltk.tokenize import TreebankWordTokenizer
-
-from .windows.focus_hook import FocusHook
 
 TRAY_ICON = os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), 'files', 'icon.png')
 
@@ -91,10 +88,6 @@ class Module:
 
 class DiscordSpeak:
     def __init__(self, name, tokenizer=None):
-        def on_focus(filename):
-            self.current_window = filename
-
-        self.hook = FocusHook(callback=on_focus)
         self.current_window = None
         self.name = name
 
@@ -136,6 +129,11 @@ class DiscordSpeak:
         if len(sys.argv) > 1:
             self.run_cli(modules, ' '.join(sys.argv[1:]))
             return
+        
+        # Windows only imports
+        from .windows.focus_hook import FocusHook
+
+        import keyboard
 
         name = self.name
         frame = None
@@ -179,7 +177,7 @@ class DiscordSpeak:
         for p in processes:
             if "discord.exe" in p.lower():
                 listen_to_process = p
-
+        
         def handle_copied_message():
             message = self.process(modules, pyperclip.paste())
 
@@ -214,10 +212,14 @@ class DiscordSpeak:
                 
                 if cont is not False:
                     keyboard.press(event.scan_code)
-    
-        self.hook.start()
+
+        def on_focus(filename):
+            self.current_window = filename
+
+        hook = FocusHook(callback=on_focus)
+        hook.start()
 
         keyboard.on_press(on_press, suppress=True)
         app.MainLoop()
 
-        self.hook.kill()
+        hook.kill()
