@@ -90,7 +90,6 @@ class DiscordSpeak:
         self.tokenizer = (lambda s: WhitespaceTokenizer().span_tokenize(s)) if tokenizer is None else tokenizer
 
     def process(self, modules, input):
-        print(input)
         message = Message(input, self.tokenizer)
 
         for module in modules:

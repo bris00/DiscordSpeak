@@ -7,6 +7,7 @@ from modules.max_syllables import MaxSyllables
 from modules.giggles import Giggles
 from modules.open_porn import OpenPorn
 from modules.spelling_mistakes import SpellingMistakes
+from modules.no_cheating import NoCheating
 
 
 def main():
@@ -20,6 +21,7 @@ def main():
         MaxSyllables(2),
         OpenPorn(likelihood=1/1000),
         SpellingMistakes(likelihood=1/30),
+        # NoCheating(),
     ])
 
 if __name__ == '__main__':
