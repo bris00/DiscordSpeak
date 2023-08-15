@@ -1,36 +1,11 @@
 from lib.discordspeak import DiscordSpeak, Module
 
-class Outbursts(Module):
-    def process_message(self, message):
-        message.add_additional_message("I'm a dummy")
+from modules.contractions import Contractions
+from modules.outbursts import Outbursts
+from modules.no_mistakes import NoMistakes
+from modules.max_syllables import MaxSyllables
+from modules.giggles import Giggles
 
-class NoMistakes(Module):
-    def on_key(self, key):
-        if key.name == "backspace":
-            return False
-
-class Contractions(Module):
-    def process_message(self, message):
-        return message.message.replace("i had", "i'd")
-
-class Giggles(Module):
-    GIGGLE_WORDS = [
-        "hah",
-        "haha",
-        "hahaha",
-        "heh",
-        "hehe",
-        "hehehe",
-        "lol",
-        "rofl",
-        "lmao",
-        "laughs",
-        "^^",
-    ]
-
-    def process_word(self, word):
-        if word.string().lower() in Giggles.GIGGLE_WORDS:
-            return "*giggles*"
 
 def main():
     app = DiscordSpeak(name="Dummyspeak")
@@ -40,6 +15,7 @@ def main():
         Outbursts(),
         Giggles(),
         Contractions(),
+        MaxSyllables(2),
     ])
 
 if __name__ == '__main__':

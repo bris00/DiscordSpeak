@@ -54,22 +54,30 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 last_key_self_pressed = None
 
 class Message:
-    def __init__(self, message):
+    def __init__(self, message, tokenizer):
         self.message = message
         self.additional_messages = []
+        self.tokenizer = tokenizer
     
     def add_additional_message(self, message):
         self.additional_messages.append(message)
 
+    def tokenize(self):
+        words = []
+        words.extend([Word(span, self, words, i) for i, span in enumerate(self.tokenizer(self.message))])
+
+        return words
+
 class Word:
     def __init__(self, span, message, words, index):
-        self.span = [span[0], span[1]]
+        self.start = span[0]
+        self.end = span[1]
         self.message = message
         self.words = words
         self.index = index
     
     def string(self):
-        return self.message.message[self.span[0]:self.span[1]]
+        return self.message.message[self.start:self.end]
 
 class Module:
     def on_key(self, event):
@@ -82,7 +90,7 @@ class Module:
         pass
 
 class DiscordSpeak:
-    def __init__(self, name):
+    def __init__(self, name, tokenizer=None):
         def on_focus(filename):
             self.current_window = filename
 
@@ -90,8 +98,10 @@ class DiscordSpeak:
         self.current_window = None
         self.name = name
 
+        self.tokenizer = (lambda s: TreebankWordTokenizer().span_tokenize(s)) if tokenizer is None else tokenizer
+
     def process(self, modules, input):
-        message = Message(input)
+        message = Message(input, self.tokenizer)
 
         for module in modules:
             res = module.process_message(message)
@@ -99,8 +109,7 @@ class DiscordSpeak:
             if res is not None:
                 message.message = res
 
-        words = []
-        words.extend([Word(span, message, words, i) for i, span in enumerate(TreebankWordTokenizer().span_tokenize(message.message))])
+        words = message.tokenize()
 
         for i, word in enumerate(words):
             for module in modules:
