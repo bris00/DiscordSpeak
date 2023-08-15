@@ -4,14 +4,12 @@ import psutil
 import pyperclip
 
 import sys
+import random
 import os
 
 from nltk.tokenize import TreebankWordTokenizer
 
 TRAY_ICON = os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), 'files', 'icon.png')
-
-global fuck
-fuck = False
 
 def create_menu_item(menu, label, func):
     item = wx.MenuItem(menu, -1, label)
@@ -47,8 +45,6 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
         wx.CallAfter(self.Destroy)
         self.frame.Close()
 
-
-last_key_self_pressed = None
 
 class Message:
     def __init__(self, message, tokenizer):
@@ -109,14 +105,14 @@ class DiscordSpeak:
                 new = module.process_word(word)
 
                 if new is not None:
-                    message.message = message.message[:word.span[0]] + new + message.message[word.span[1]:]
+                    message.message = message.message[:word.start] + new + message.message[word.end:]
                     
-                    extra_len = len(new) - (word.span[1] - word.span[0])
-                    word.span[1] += extra_len
+                    extra_len = len(new) - (word.end - word.start)
+                    word.end += extra_len
 
                     for w in words[i:]:
-                        w.span[0] += extra_len
-                        w.span[1] += extra_len
+                        w.start += extra_len
+                        w.end += extra_len
 
         return message
 
@@ -192,6 +188,11 @@ class DiscordSpeak:
             keyboard.send("ctrl+x")
             keyboard.call_later(handle_copied_message, args=(), delay=0.0001)
 
+        def on_key(module, event):
+            res = module.on_key(event)
+
+            return [event.name] if res is None else res
+
         def on_press(event):
             print(self.current_window, event.name)
 
@@ -203,15 +204,15 @@ class DiscordSpeak:
                 keyboard.send("ctrl+a")
                 keyboard.call_later(copy_message, args=(), delay=0.0001)
             else:
-                cont = True
-                for module in modules:
-                    cont = module.on_key(event)
-
-                    if cont is False:
-                        break
                 
-                if cont is not False:
-                    keyboard.press(event.scan_code)
+                keys = [event]
+
+                for module in modules:
+                    f = lambda event: module.on_key(event)
+                    keys = flatten([on_key(module, keyboard.KeyboardEvent("down", key_to_scan_codes(key)[0])) for key in keys])
+                
+                for key in keys:
+                    keyboard.send(key)
 
         def on_focus(filename):
             self.current_window = filename
@@ -223,3 +224,8 @@ class DiscordSpeak:
         app.MainLoop()
 
         hook.kill()
+
+class helpers:
+    @staticmethod
+    def chance(odds):
+        return random.random() < odds

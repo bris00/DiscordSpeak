@@ -5,6 +5,8 @@ from modules.outbursts import Outbursts
 from modules.no_mistakes import NoMistakes
 from modules.max_syllables import MaxSyllables
 from modules.giggles import Giggles
+from modules.open_porn import OpenPorn
+from modules.spelling_mistakes import SpellingMistakes
 
 
 def main():
@@ -16,6 +18,8 @@ def main():
         Giggles(),
         Contractions(),
         MaxSyllables(2),
+        OpenPorn(),
+        SpellingMistakes(),
     ])
 
 if __name__ == '__main__':
