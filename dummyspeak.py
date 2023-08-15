@@ -14,12 +14,12 @@ def main():
 
     app.run([
         NoMistakes(),
-        Outbursts(),
+        Outbursts(likelihood=1/10),
         Giggles(),
         Contractions(),
         MaxSyllables(2),
-        OpenPorn(),
-        SpellingMistakes(),
+        OpenPorn(likelihood=1/1000),
+        SpellingMistakes(likelihood=1/30),
     ])
 
 if __name__ == '__main__':

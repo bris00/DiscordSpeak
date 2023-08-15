@@ -7,7 +7,7 @@ import sys
 import random
 import os
 
-from nltk.tokenize import TreebankWordTokenizer
+from nltk.tokenize import WhitespaceTokenizer
 
 TRAY_ICON = os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), 'files', 'icon.png')
 
@@ -87,9 +87,10 @@ class DiscordSpeak:
         self.current_window = None
         self.name = name
 
-        self.tokenizer = (lambda s: TreebankWordTokenizer().span_tokenize(s)) if tokenizer is None else tokenizer
+        self.tokenizer = (lambda s: WhitespaceTokenizer().span_tokenize(s)) if tokenizer is None else tokenizer
 
     def process(self, modules, input):
+        print(input)
         message = Message(input, self.tokenizer)
 
         for module in modules:
@@ -200,19 +201,24 @@ class DiscordSpeak:
                 keyboard.press(event.scan_code)
                 return
 
+            # TODO: If user is in middle of selecting an emoji perhaps do not submit message
             if event.name == "enter":
                 keyboard.send("ctrl+a")
                 keyboard.call_later(copy_message, args=(), delay=0.0001)
             else:
-                
-                keys = [event]
+                keys = [event.name]
 
                 for module in modules:
-                    f = lambda event: module.on_key(event)
-                    keys = flatten([on_key(module, keyboard.KeyboardEvent("down", key_to_scan_codes(key)[0])) for key in keys])
+                    keys = [k for key in keys for k in on_key(module, keyboard.KeyboardEvent("down", keyboard.key_to_scan_codes(key)[0], name=key))]
                 
+                pressed_original = False
+
                 for key in keys:
-                    keyboard.send(key)
+                    if not pressed_original and keyboard.is_modifier(key) and key == event.name:
+                        pressed_original = True
+                        keyboard.press(key)
+                    else:
+                        keyboard.send(key)
 
         def on_focus(filename):
             self.current_window = filename

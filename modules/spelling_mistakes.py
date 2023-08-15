@@ -1,4 +1,6 @@
-from lib.discordspeak import Module
+from lib.discordspeak import Module, helpers
+
+import random
 
 q, w, e, r, t, y, u, i, o, p, a, s, d, f, g, h, j, k, l, z, x, c, v, b, n, m = 'qwertyuiopasdfghjklzxcvbnm'
 
@@ -32,8 +34,11 @@ keyboard_near = dict(
 )
 
 class SpellingMistakes(Module):
+    def __init__(self, likelihood=1/100):
+        self.likelihood = likelihood
+
     def on_key(self, key):
-        if helpers.chance(1/100):
+        if helpers.chance(self.likelihood):
             if key.name not in keyboard_near or helpers.chance(1/2):
                 return []
             else:
