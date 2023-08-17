@@ -17,6 +17,5 @@ class Giggles(Module):
     ]
 
     def process_word(self, word):
-        print(word.string())
         if word.string().lower() in Giggles.GIGGLE_WORDS:
             return "*giggles*"

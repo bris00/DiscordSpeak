@@ -8,6 +8,8 @@ from modules.giggles import Giggles
 from modules.open_porn import OpenPorn
 from modules.spelling_mistakes import SpellingMistakes
 from modules.no_cheating import NoCheating
+from modules.small_vocabulary import SmallVocabulary
+
 
 
 def main():
@@ -21,7 +23,8 @@ def main():
         MaxSyllables(2),
         OpenPorn(likelihood=1/1000),
         SpellingMistakes(likelihood=1/30),
-        # NoCheating(),
+        NoCheating(),
+        SmallVocabulary(5000),
     ])
 
 if __name__ == '__main__':

@@ -47,5 +47,5 @@ class MaxSyllables(Module):
         for word in message.tokenize():
             count = self.num_syllables(word.string())
 
-            if count > self.max:
+            if len(word.string()) > 2 and count > self.max:
                 return message.message[:word.start].rstrip() + ", uuuhhh what was I talking about again?"

@@ -4,6 +4,10 @@ from modules.outbursts import Outbursts
 
 from nltk.tokenize import WhitespaceTokenizer
 import random
+import sys
+import os
+
+vocabulary = set(line.split(" ")[0] for line in open(os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), 'files', 'enwiki-words-frequency.txt')))
 
 class NoCheating(Module):
     def process_message(self, message):
@@ -29,9 +33,8 @@ class NoCheating(Module):
 
             only_alpha = ''.join(filter(lambda l: l.isalpha(), word))
 
-            # TODO: Check if only_alpha is a word in the vocabulary
-
-            print(only_alpha)
+            if not only_alpha.lower() in vocabulary:
+                return False
 
             return True
 
