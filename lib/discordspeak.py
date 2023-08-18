@@ -2,6 +2,7 @@ import wx.adv
 import wx
 import psutil
 import pyperclip
+import string
 
 import sys
 import random
@@ -169,6 +170,8 @@ class DiscordSpeak:
         processes = list(set(processes))
 
         listen_to_process = None
+        typing_emoji = False
+        non_emoji_aborting_keys = set(string.printable) - set((' ', ':')) 
 
         for p in processes:
             if "discord.exe" in p.lower():
@@ -194,17 +197,26 @@ class DiscordSpeak:
             return [event.name] if res is None else res
 
         def on_press(event):
+            nonlocal typing_emoji
             print(self.current_window, event.name)
 
             if self.current_window != listen_to_process:
                 keyboard.press(event.scan_code)
                 return
 
-            # TODO: If user is in middle of selecting an emoji perhaps do not submit message
             if event.name == "enter":
-                keyboard.send("ctrl+a")
-                keyboard.call_later(copy_message, args=(), delay=0.0001)
+                if typing_emoji:
+                    typing_emoji = False
+                    keyboard.press(event.scan_code)
+                else:
+                    keyboard.send("ctrl+a")
+                    keyboard.call_later(copy_message, args=(), delay=0.0001)
             else:
+                if typing_emoji and (not event.name in non_emoji_aborting_keys):
+                    typing_emoji = False
+                elif event.name == ":":
+                    typing_emoji = True
+
                 keys = [event.name]
 
                 for module in modules:
