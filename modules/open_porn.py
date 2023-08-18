@@ -1,4 +1,5 @@
-from lib.discordspeak import Module, helpers
+from lib.discordspeak import Module
+from lib.helpers import chance
 
 import webbrowser
 
@@ -7,5 +8,5 @@ class OpenPorn(Module):
         self.likelihood = likelihood
 
     def on_key(self, _):
-        if helpers.chance(self.likelihood):
+        if chance(self.likelihood):
             webbrowser.open("https://scrolller.com/r/cumsluts")

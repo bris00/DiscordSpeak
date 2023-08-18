@@ -11,7 +11,6 @@ from modules.no_cheating import NoCheating
 from modules.small_vocabulary import SmallVocabulary
 
 
-
 def main():
     app = DiscordSpeak(name="Dummyspeak")
 
@@ -22,9 +21,9 @@ def main():
         Contractions(),
         MaxSyllables(2),
         OpenPorn(likelihood=1/1000),
-        SpellingMistakes(likelihood=1/30),
         NoCheating(),
-        SmallVocabulary(5000),
+        SmallVocabulary(10000),
+        SpellingMistakes(likelihood=1/30),
     ])
 
 if __name__ == '__main__':

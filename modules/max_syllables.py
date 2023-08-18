@@ -1,4 +1,5 @@
 from lib.discordspeak import Module
+from lib.helpers import in_vocabulary
 
 import nltk
 import nltk.corpus
@@ -45,6 +46,9 @@ class MaxSyllables(Module):
 
     def process_message(self, message):
         for word in message.tokenize():
+            if not in_vocabulary(word.string()):
+                continue
+
             count = self.num_syllables(word.string())
 
             if len(word.string()) > 2 and count > self.max:

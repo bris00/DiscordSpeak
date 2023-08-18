@@ -229,8 +229,3 @@ class DiscordSpeak:
         app.MainLoop()
 
         hook.kill()
-
-class helpers:
-    @staticmethod
-    def chance(odds):
-        return random.random() < odds

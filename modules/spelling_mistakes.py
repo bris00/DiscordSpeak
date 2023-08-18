@@ -1,4 +1,5 @@
-from lib.discordspeak import Module, helpers
+from lib.discordspeak import Module
+from lib.helpers import chance, in_vocabulary
 
 import random
 
@@ -37,9 +38,17 @@ class SpellingMistakes(Module):
     def __init__(self, likelihood=1/100):
         self.likelihood = likelihood
 
-    def on_key(self, key):
-        if helpers.chance(self.likelihood):
-            if key.name not in keyboard_near or helpers.chance(1/2):
-                return []
-            else:
-                return [random.choice(keyboard_near[key.name])]
+    def process_word(self, word):
+        if in_vocabulary(word.string()):
+            new_word = ""
+
+            for letter in word.string():
+                if chance(self.likelihood):
+                    if letter not in keyboard_near or chance(1/2):
+                        pass
+                    else:
+                        new_word += random.choice(keyboard_near[letter])
+                else:
+                    new_word += letter
+
+            return new_word

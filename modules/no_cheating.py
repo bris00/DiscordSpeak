@@ -1,4 +1,5 @@
 from lib.discordspeak import Module
+from lib.helpers import in_vocabulary
 
 from modules.outbursts import Outbursts
 
@@ -7,7 +8,6 @@ import random
 import sys
 import os
 
-vocabulary = set(line.split(" ")[0] for line in open(os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), 'files', 'enwiki-words-frequency.txt')))
 
 class NoCheating(Module):
     def process_message(self, message):
@@ -33,7 +33,7 @@ class NoCheating(Module):
 
             only_alpha = ''.join(filter(lambda l: l.isalpha(), word))
 
-            if not only_alpha.lower() in vocabulary:
+            if not in_vocabulary(only_alpha):
                 return False
 
             return True
