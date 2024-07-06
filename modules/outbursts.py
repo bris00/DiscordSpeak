@@ -1,12 +1,10 @@
 from lib.discordspeak import Module
-from lib.helpers import chance
-
-import random
+from lib.helpers import chance, item, choice
 
 class Outbursts(Module):
     OUTBURSTS = [
-        "I'm a dummy",
-        "I'm a legit snack",
+        item("I'm a dummy", weight=3),
+        item("I'm a legit snack"),
     ]
 
     def __init__(self, likelihood=1/100):
@@ -14,4 +12,4 @@ class Outbursts(Module):
 
     def process_message(self, message):
         if chance(self.likelihood):
-            message.add_additional_message(random.choice(Outbursts.OUTBURSTS))
+            message.add_additional_message(choice(Outbursts.OUTBURSTS))

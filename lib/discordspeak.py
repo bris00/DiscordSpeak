@@ -5,10 +5,14 @@ import pyperclip
 import string
 
 import sys
-import random
 import os
 
+from nltk.tag import pos_tag
 from nltk.tokenize import WhitespaceTokenizer
+
+import nltk
+
+nltk.download('averaged_perceptron_tagger')
 
 TRAY_ICON = os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), 'files', 'icon.png')
 
@@ -52,13 +56,29 @@ class Message:
         self.message = message
         self.additional_messages = []
         self.tokenizer = tokenizer
+        self.stop = False
     
     def add_additional_message(self, message):
         self.additional_messages.append(message)
 
-    def tokenize(self):
+    def exit_early(self):
+        self.stop = True
+        
+    def should_continue(self):
+        return self.stop == False
+
+    def tokenize(self, tokenizer=None, pos=None):
+        if tokenizer is None:
+            actualTokenizer = self.tokenizer
+        
+        if pos is None:
+            actualPos = pos_tag
+
         words = []
-        words.extend([Word(span, self, words, i) for i, span in enumerate(self.tokenizer(self.message))])
+        words.extend([Word(span, self, words, i) for i, span in enumerate(actualTokenizer(self.message))])
+
+        for i, (_, tag) in enumerate(actualPos([word.string() for word in words])):
+            words[i].set_tag(tag)
 
         return words
 
@@ -69,9 +89,16 @@ class Word:
         self.message = message
         self.words = words
         self.index = index
+        self.tag = None
     
     def string(self):
         return self.message.message[self.start:self.end]
+
+    def set_tag(self, tag):
+        self.tag = tag
+
+    def __repr__(self):
+        return f"Word({self.string()}, {self.tag})"
 
 class Module:
     def on_key(self, event):
@@ -82,6 +109,11 @@ class Module:
 
     def process_word(self, word: Word):
         pass
+
+class Logger(Module):
+    def process_message(self, message):
+        print(message)
+        print(message.tokenize())
 
 class DiscordSpeak:
     def __init__(self, name, tokenizer=None):
@@ -94,15 +126,17 @@ class DiscordSpeak:
         message = Message(input, self.tokenizer)
 
         for module in modules:
+            if not message.should_continue():
+                break
+
             res = module.process_message(message)
 
             if res is not None:
                 message.message = res
+            
+            words = message.tokenize()
 
-        words = message.tokenize()
-
-        for i, word in enumerate(words):
-            for module in modules:
+            for i, word in enumerate(words):
                 new = module.process_word(word)
 
                 if new is not None:
@@ -189,7 +223,7 @@ class DiscordSpeak:
 
         def copy_message():
             keyboard.send("ctrl+x")
-            keyboard.call_later(handle_copied_message, args=(), delay=0.0001)
+            keyboard.call_later(handle_copied_message, args=(), delay=0.1)
 
         def on_key(module, event):
             res = module.on_key(event)
@@ -210,7 +244,7 @@ class DiscordSpeak:
                     keyboard.press(event.scan_code)
                 else:
                     keyboard.send("ctrl+a")
-                    keyboard.call_later(copy_message, args=(), delay=0.0001)
+                    keyboard.call_later(copy_message, args=(), delay=0.1)
             else:
                 if typing_emoji and (not event.name in non_emoji_aborting_keys):
                     typing_emoji = False

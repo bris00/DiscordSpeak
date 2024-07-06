@@ -1,5 +1,7 @@
 import os, sys
 import random
+from itertools import repeat
+from nltk.metrics.distance import edit_distance
 
 def vocabulary_words(n=None):
     if n is None:
@@ -23,3 +25,20 @@ def chance(odds):
 vocabulary_filename = os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), 'files', 'enwiki-words-frequency.txt')
 
 vocabulary = set(vocabulary_words())
+
+def match(word, list):
+    return any(fn(word.lower()) for fn in list)
+
+def distance(word, d):
+    return lambda x: edit_distance(word, x) <= d
+
+def exact(word):
+    return lambda x: x == word
+
+def choice(list):
+    return random.choice([
+        instance for item in list for instance in repeat(item[1], item[0])
+    ])
+
+def item(x, weight=1):
+    return (weight, x)

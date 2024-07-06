@@ -1,12 +1,9 @@
 from lib.discordspeak import Module
-from lib.helpers import in_vocabulary
+from lib.helpers import choice, in_vocabulary
 
 from modules.outbursts import Outbursts
 
 from nltk.tokenize import WhitespaceTokenizer
-import random
-import sys
-import os
 
 
 class NoCheating(Module):
@@ -41,6 +38,8 @@ class NoCheating(Module):
         bad_words = list(filter(filter_fn, words))
 
         if len(bad_words) > 0:
+            message.exit_early()
             message.add_additional_message("Uhhh... thinking is like really difficult right now")
-            return random.choice(Outbursts.OUTBURSTS)
+            return choice(Outbursts.OUTBURSTS)
+
         

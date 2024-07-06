@@ -18,7 +18,7 @@ class MaxSyllables(Module):
             return self.num_syllables_heuristic(word)
 
     def lookup_num_syllables(self, word):
-        return sum([len(list(y for y in x if y[-1].isdigit())) for x in self.cmud[word.lower()]])
+        return min([len(list(y for y in x if y[-1].isdigit())) for x in self.cmud[word.lower()]])
 
     def num_syllables_heuristic(self, word):
         # Reference: stackoverflow.com/questions/14541303/count-the-number-of-syllables-in-a-word
@@ -51,5 +51,6 @@ class MaxSyllables(Module):
 
             count = self.num_syllables(word.string())
 
-            if len(word.string()) > 2 and count > self.max:
+            # len(word.string()) > 4 and 
+            if count > self.max:
                 return message.message[:word.start].rstrip() + ", uuuhhh what was I talking about again?"

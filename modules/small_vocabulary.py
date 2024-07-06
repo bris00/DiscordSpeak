@@ -1,9 +1,6 @@
 from lib.discordspeak import Module
 from lib.helpers import vocabulary, vocabulary_words, in_vocabulary
 
-import os
-import sys
-
 class SmallVocabulary(Module):
     def __init__(self, vocabulary_size=20000):
         self.neg_vocabulary = vocabulary - set(vocabulary_words(vocabulary_size))

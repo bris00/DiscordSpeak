@@ -1,4 +1,4 @@
-from lib.discordspeak import DiscordSpeak, Module
+from lib.discordspeak import DiscordSpeak, Logger, Module
 
 from modules.contractions import Contractions
 from modules.outbursts import Outbursts
@@ -9,21 +9,24 @@ from modules.open_porn import OpenPorn
 from modules.spelling_mistakes import SpellingMistakes
 from modules.no_cheating import NoCheating
 from modules.small_vocabulary import SmallVocabulary
+from modules.simplify_speech import SimplifySpeech
 
 
 def main():
     app = DiscordSpeak(name="Dummyspeak")
 
     app.run([
-        NoMistakes(),
-        Outbursts(likelihood=1/10),
-        Giggles(),
-        Contractions(),
-        MaxSyllables(2),
-        OpenPorn(likelihood=1/1000),
+        #SimplifySpeech(likelihood=1/1),
+        #MaxSyllables(2),
+        #NoMistakes(),
+        #Outbursts(likelihood=1/1),
+        #Giggles(),
+        #Contractions(),
+        #OpenPorn(likelihood=1/1000),
+        #Logger(),
         NoCheating(),
         SmallVocabulary(10000),
-        SpellingMistakes(likelihood=1/30),
+        #SpellingMistakes(likelihood=1/30),
     ])
 
 if __name__ == '__main__':
